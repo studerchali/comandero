@@ -7,6 +7,7 @@ import { useRestaurantStore } from '../../store/useRestaurantStore'
 import { Button } from '../../ui/Button'
 import { formatCurrency } from '../../utils/format'
 import { calculateDraftTotals, calculateOrderTotals } from '../../utils/pricing'
+import { groupSentItemsByBatch } from '../../utils/sentItems'
 import { OrderLineItemRow } from './OrderLineItem'
 
 interface OrderPanelProps {
@@ -34,7 +35,10 @@ export function OrderPanel({ tableId, tableLabel, compact = false }: OrderPanelP
   )
 
   const draftItems = order?.items.filter((i) => !i.sentAt) ?? []
-  const sentItems = order?.items.filter((i) => i.sentAt) ?? []
+  const sentBatches = useMemo(
+    () => groupSentItemsByBatch(order?.items ?? []),
+    [order?.items],
+  )
   const canSend = draftItems.length > 0
   const hasOrder = (order?.items.length ?? 0) > 0
 
@@ -52,21 +56,34 @@ export function OrderPanel({ tableId, tableLabel, compact = false }: OrderPanelP
           <p className="py-6 text-center text-sm text-cmd-muted">{t.order.empty}</p>
         )}
 
-        {sentItems.length > 0 && (
+        {sentBatches.length > 0 && (
           <div className="space-y-2">
             <p className="px-1 text-xs font-semibold uppercase tracking-wide text-cmd-muted">
               {t.order.alreadySent}
             </p>
-            <ul className="space-y-2">
-              {sentItems.map((item) => (
-                <OrderLineItemRow
-                  key={item.id}
-                  item={item}
-                  onUpdateQuantity={updateItemQuantity}
-                  onRemove={removeItem}
-                />
+            <div className="space-y-2">
+              {sentBatches.map((batch, batchIndex) => (
+                <div key={batch[0].sentAt}>
+                  {batchIndex > 0 && (
+                    <div
+                      className="mb-2 border-t border-cmd-border/25"
+                      role="separator"
+                      aria-hidden
+                    />
+                  )}
+                  <ul className="space-y-2">
+                    {batch.map((item) => (
+                      <OrderLineItemRow
+                        key={item.id}
+                        item={item}
+                        onUpdateQuantity={updateItemQuantity}
+                        onRemove={removeItem}
+                      />
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         )}
       </div>
