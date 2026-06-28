@@ -7,7 +7,7 @@ Aplicación web PWA para que **camareros tomen comandas** en tablets dentro de u
 
 **Repositorio:** [github.com/studerchali/comandero](https://github.com/studerchali/comandero)
 
-**Demo:** _Pendiente de despliegue — ver sección [Despliegue](#despliegue)_
+**Demo en vivo:** [pda-app-iota.vercel.app](https://pda-app-iota.vercel.app)
 
 ## Características
 
